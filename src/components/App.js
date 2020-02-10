@@ -36,7 +36,6 @@ function App() {
       setLogedIn(true);
     } else {
       setPassword("");
-      setLogedIn(false);
     }
   }
 }
