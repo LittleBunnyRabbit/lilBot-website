@@ -7,9 +7,10 @@ function App() {
   const [logedIn, setLogedIn] = useState(false);
   const [password, setPassword] = useState(null);
   return (
-    <div>
-      { logedIn ? (<Main />) : logInPage() }
-    </div>    
+    // <div>
+    //   { logedIn ? (<Main />) : logInPage() }
+    // </div>    
+    <Main />
   );
 
   function logInPage() {
