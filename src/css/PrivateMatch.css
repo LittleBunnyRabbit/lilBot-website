@@ -1,0 +1,35 @@
+.r-row {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+.r-col {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.r-col-name {
+    text-align: center;
+}
+
+.participants-btn-td {
+    text-align: center;
+    width: 1%;
+    height: 1%;
+}
+
+.headerButton {
+    border-radius: 0 !important;
+    width: 30%;
+}
+
+.headerButtonGroup {
+    width: 100%;
+}
+
+.r-body {
+    align-items: center;
+}
