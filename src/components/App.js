@@ -34,9 +34,7 @@ function App() {
   function checkPassword() {
     if(pwd == password) {
       setLogedIn(true);
-    } else {
-      setPassword("");
-    }
+    } 
   }
 }
 
