@@ -3,6 +3,8 @@ import { Row, Button, ButtonGroup, Col, Card, Table, Form, Container, Tabs, Tab,
 import "../css/PrivateMatch.css";
 import request from "request";
 
+const socket = new WebSocket('ws://localhost:12312');
+
 function PrivateMatch() {
     const [loadData, setLoadData] = useState(true);
     const [matchInfo, setMatchInfo] = useState({});
@@ -19,6 +21,16 @@ function PrivateMatch() {
         console.log("PrivateMatch");
         updateAll().then(() => {
           console.log("Private Match");
+        });
+        const socket = new WebSocket('ws://localhost:6901');
+
+        // socket.addEventListener('open', function (event) {
+        //     socket.send('Hello Server!');
+        // });
+
+        socket.addEventListener('message', function (event) {
+            setMatchUsername(event.data)
+            console.log('Message from server ', event.data);
         });
     }, [loadData]);
 
@@ -357,6 +369,14 @@ function PrivateMatch() {
         length: passwordLength
       }});
       await updateAll();
+    }
+
+    function socketRequest(request, data) {
+      if(!request) return;
+      request = request.toUpperCase();
+      const reqBody = { request };
+      if(data) reqBody.data = data;
+      return socket.send(JSON.stringify(reqBody));
     }
 }
 

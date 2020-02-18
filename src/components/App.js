@@ -4,13 +4,23 @@ import Main from "./Main";
 
 function App() {
   const pwd = require("../config.json").password;
+  const [load, setLoad] = useState(false);
   const [logedIn, setLogedIn] = useState(false);
   const [password, setPassword] = useState(null);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  console.log(BASE_URL);
+
+  useEffect(() => {
+    console.log("load");
+    
+  }, [load]);
+  
   return (
-    // <div>
-    //   { logedIn ? (<Main />) : logInPage() }
-    // </div>    
-    <Main />
+    <div>
+      {/*{ logedIn ? (<Main />) : logInPage() }*/}
+      <Main />
+    </div>    
+    // <Main />
   );
 
   function logInPage() {
@@ -33,9 +43,7 @@ function App() {
   }
 
   function checkPassword() {
-    if(pwd == password) {
-      setLogedIn(true);
-    } 
+    setLogedIn(true);
   }
 }
 
