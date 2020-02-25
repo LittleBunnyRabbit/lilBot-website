@@ -1,85 +1,117 @@
-import React, { useState, useEffect  } from 'react';
-import { Row, Button, ButtonGroup, Col, Card, Table, Form, Container, Tabs, Tab, InputGroup, FormControl, Jumbotron } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Alert, Overlay, Row, Button, 
+  ButtonGroup, Col, Card, Table, 
+  Form, Container, Tabs, Tab, 
+  InputGroup, FormControl, Jumbotron 
+} from 'react-bootstrap';
 import "../css/PrivateMatch.css";
-import request from "request";
+import io from 'socket.io-client';
 
-const socket = new WebSocket('ws://localhost:12312');
+const socket = io("http://localhost:2513/private-match", { 
+  query: { username: "abc", password: 12312 } 
+});  
 
-function PrivateMatch() {
+function PrivateMatch(props) {
     const [loadData, setLoadData] = useState(true);
-    const [matchInfo, setMatchInfo] = useState({});
-    const [removedParicipants, setRemovedParicipants] = useState([]);
-    const [participants, setParicipants] = useState([]);
-    const [passwordLength, setPasswordLength] = useState(5);
-    const [players, setPlayers] = useState([]);
-    const [matchUsername, setMatchUsername] = useState(null);
-    const [matchPassword, setMatchPassword] = useState(null);
-    const [matchSubs, setMatchSubs] = useState(false);
-    const [displayParticipants, setDisplayParticipants] = useState(true);
+
+    const [match, setMatch] = useState({});
+    const [activeMatch, setActiveMatch] = useState([]);
+    const [queue, setQueue] = useState([]);
+    const [canJoin, setCanJoin] = useState(false);
+    const [newMatch, setNewMatch] = useState({ subsOnly: false });
+    const [removedQueue, setRemovedQueue] = useState([]);
+    
+    const [queueDisplayType, setQueueDisplayType] = useState(true);
+    const [alert, setAlert] = useState({ show: false, info: "" });  
 
     useEffect(() => {
-        console.log("PrivateMatch");
-        updateAll().then(() => {
-          console.log("Private Match");
+        socket.on("match", (data) => {
+            if(!data) return;
+            setMatch(data);
         });
-        const socket = new WebSocket('ws://localhost:6901');
 
-        // socket.addEventListener('open', function (event) {
-        //     socket.send('Hello Server!');
-        // });
+        socket.on("activeMatch", (data) => {
+            if(!data) return;
+            setActiveMatch(data);
+        });
 
-        socket.addEventListener('message', function (event) {
-            setMatchUsername(event.data)
-            console.log('Message from server ', event.data);
+        socket.on("queue", (data) => {
+            if(!data) return;
+            setQueue(data);
+        });
+
+        socket.on("canJoin", (data) => {
+            if(!data) return;
+            setCanJoin(data);
+        });
+
+        socket.on("reqError", (data) => {
+            if(!data) return;
+            setAlert({ show: true, info: data.error });
+        });
+
+        socket.emit("getData", {
+            match: true,
+            activeMatch: true,
+            queue: true,
+            canJoin: true
         });
     }, [loadData]);
+
+    function makeDummyQueue() {
+        socket.emit("setData", {
+          queue: [
+            { username: "Player 1",  isSub: true,  id:"1"},
+            { username: "Player 2",  isSub: false, id:"2"},
+            { username: "Player 3",  isSub: true,  id:"4"},
+            { username: "Player 4",  isSub: true,  id:"5"},
+            { username: "Player 5",  isSub: false, id:"6"},
+            { username: "Player 6",  isSub: false, id:"7"},
+            { username: "Player 7",  isSub: true,  id:"8"},
+            { username: "Player 8",  isSub: true,  id:"9"},
+            { username: "Player 9",  isSub: false, id:"10"},
+            { username: "Player 10", isSub: true,  id:"11"},
+            { username: "Player 11", isSub: true,  id:"12"},
+            { username: "Player 12", isSub: true,  id:"13"},
+            { username: "Player 13", isSub: false, id:"14"},
+            { username: "Player 14", isSub: true,  id:"15"},
+            { username: "Player 15", isSub: false, id:"160"}
+          ]
+        })
+    }
 
     return (
       <Container>
         <br/>
-        <Row className="r-row">
-          <Col className="r-col">
-            <Card>
-              <Card.Header>Create</Card.Header>
-              <Card.Body>
-                { RenderCreateMatch() }
-              </Card.Body>
-            </Card>
-          </Col>
+        { alert?.show && <ErrorAlert target={ this } /> }
 
-          <Col className="r-col">
-            <Card>
-              <Card.Header>Match</Card.Header>
-              <Card.Body>
-                { RenderMatchInfo() }
-              </Card.Body>
-            </Card>
-          </Col>
+        <Row className="r-row">
+          <CardColumn title="Create" content={ <RenderCreateMatch /> } />
+          <CardColumn title="Match" content={ <RenderMatchInfo /> } />
         </Row>  
-        <br/>
-        <Row className="r-row">
-          <Col className="r-col">
-            <Card>
-              <Card.Header>Participants</Card.Header>
-              <Card.Body>
-                { RenderParticipants() }
-              </Card.Body>
-            </Card>
-          </Col>
 
-          <Col className="r-col">
-            <Card>
-              <Card.Header>Start</Card.Header>
-              <Card.Body>
-                { RenderStartMatch() }
-              </Card.Body>
-            </Card>
-          </Col>
+        <br/>
+
+        <Row className="r-row">
+          <CardColumn title="Queue" content={ <RenderQueue /> } />
+          <CardColumn title="Active Match" content={ <RenderActiveMatch /> } />
         </Row>
+
+        <br/><br/><br/>
+
+        <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
+          <Button variant="secondary" style={{width:"50%"}} onClick={makeDummyQueue}> DUMMY </Button>
+          <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", {activeMatch: {}})}> Clear Match </Button>
+        </ButtonGroup>
       </Container>
-    )
+    );
 
     function RenderCreateMatch() {
+      async function createMatch() {
+          return socket.emit("createMatch", newMatch);
+      }
+
       return (
         <div>
           <InputGroup className="mb-3">
@@ -87,8 +119,12 @@ function PrivateMatch() {
               <InputGroup.Text id="inputGroup-username">Username</InputGroup.Text>
             </InputGroup.Prepend>
             <FormControl                 
-              value={matchUsername} 
-              onChange={(e) => setMatchUsername(e.target.value)}
+              value={newMatch?.username} 
+              onChange={(e) => {
+                const nm = { ...newMatch }
+                nm.username = e.target.value;
+                setNewMatch(nm);
+              }}
             />
           </InputGroup>
           <InputGroup className="mb-3">
@@ -96,287 +132,263 @@ function PrivateMatch() {
               <InputGroup.Text id="inputGroup-password">Password</InputGroup.Text>
             </InputGroup.Prepend>
             <FormControl 
-              value={matchPassword} 
-              onChange={(e) => setMatchPassword(e.target.value)}
+              value={newMatch?.password} 
+              onChange={(e) => {
+                const nm = { ...newMatch }
+                nm.password = e.target.value;
+                setNewMatch(nm);
+              }}
               placeholder="Auto Generated" 
             />
           </InputGroup>
           <InputGroup className="mb-3">
             <InputGroup.Prepend>
               <InputGroup.Checkbox
-                checked={matchSubs} 
-                onChange={(e) => setMatchSubs(e.target.checked)}
+                checked={newMatch?.subsOnly} 
+                onChange={(e) => {
+                  const nm = { ...newMatch }
+                  nm.subsOnly = e.target.checked;
+                  setNewMatch(nm);
+                }}
               />
             </InputGroup.Prepend>
             <FormControl 
-              value={matchSubs ? "Subscribers only" : "Everyone"}
+              value={newMatch?.subsOnly ? "Subscribers only" : "Everyone"}
               disabled
             />
           </InputGroup>
           <Button 
               variant="secondary" 
               type="button"
-              onClick={updateMatchInfo} 
+              onClick={ createMatch } 
               style={{width:"100%"}}
+              disabled={!newMatch?.username || newMatch?.username.trim() == ""}
           > Submit </Button>
         </div>
       );
     }
 
     function RenderMatchInfo() {
-      return (
-        <div>
-          <Table striped bordered hover>
-            <tbody>
-              <tr>
-                <td style={{width:"2%"}}>Username</td>
-                <td>{ matchInfo.username }</td>
-              </tr>
-              <tr>
-                <td style={{width:"2%"}}>Password</td>
-                <td>{ matchInfo.password }</td>
-              </tr>
-              <tr>
-                <td style={{width:"2%"}}>Type</td>
-                <td>{ matchInfo.subsOnly ? "Subscribers only" : "Everyone" }</td>
-              </tr>
-            </tbody>
-          </Table>
-          <Button 
-            variant="secondary" 
-            type="button"
-            onClick={updatePassword} 
-            style={{width:"100%"}}
-          > New Password </Button>
-        </div>
-      );
-    }
-
-    function RenderParticipants() {
-      const removeParticipant = async (id) => {
-        const participant = participants.find(p => p.id === id);
-        const removedParicipantsNew = [...removedParicipants];
-        removedParicipantsNew.push(participant);
-        await dataTool(
-          "http://localhost:6969/stores/private-matches/leaveMatch", 
-          { json: true, method: "DELETE", body: { id } }
-        );
-        await updateParticipants();
-        setRemovedParicipants(removedParicipantsNew);
-      }
-
-      const addParticipant = async (id) => {
-        const removedParicipantsNew = [...removedParicipants];
-        const index = removedParicipantsNew.findIndex(p => p.id === id);
-        if(index === -1) return;
-        const participant = removedParicipantsNew.splice(index, 1)[0];
-        setRemovedParicipants(removedParicipantsNew);
-        await dataTool(
-          "http://localhost:6969/stores/private-matches/joinMatch", 
-          { json: true, method: "POST", body: participant }
-        );
-        await updateParticipants();
-      }
-
-      const emptyTable = (
-        <Table striped bordered hover>
-          <thead>
-            <tr><th style={{ textAlign: "center" }}>Empty</th></tr>
-          </thead>
-        </Table>
-      );
-
-      return (
-        <div>
-          <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
-            <Button variant="secondary" style={{width:"50%"}} onClick={updateParticipants}> Refresh </Button>
-            <Button variant="secondary" style={{width:"50%"}} onClick={clearParticipants} > Clear </Button>
-          </ButtonGroup>
-          <ButtonGroup aria-label="Basic example" style={{width:"100%",  marginTop:"5%", marginBottom:"5%"}}>
-            <Button variant="outline-success" style={{width:"50%"}} onClick={() => setDisplayParticipants(true)}> Active </Button>
-            <Button variant="outline-danger" style={{width:"50%"}} onClick={() => setDisplayParticipants(false)} > Removed </Button>
-          </ButtonGroup>
-
-          { displayParticipants && (participants.length > 0 ? ParticipantsTable() : emptyTable) }
-          { !displayParticipants && (removedParicipants.length > 0 ? RemovedParicipantsTable() : emptyTable) }
-        </div>
-      );
-
-      function ParticipantsTable() {
-        return (
-          <Table striped bordered hover>
-            <tbody>
-              { 
-                participants.map((p, i) => {
-                  return (
-                    <tr>
-                      <td className="participants-btn-td">
-                        <Button 
-                          variant="outline-danger" 
-                          onClick={() => removeParticipant(p.id)}
-                        > X </Button>
-                      </td>
-                      <td>{ p.username }</td>
-                    </tr>
-                  );
-                })
-              }
-            </tbody>
-          </Table>
-        );
-      }
-  
-      function RemovedParicipantsTable() {
-        return (
-          <Table striped bordered hover>
-            <tbody>
-              { 
-              removedParicipants.map((p, i) => {
-                  return (
-                    <tr>
-                      <td className="participants-btn-td">
-                        <Button 
-                          variant="outline-success" 
-                          onClick={() => addParticipant(p.id)}
-                        > ✓ </Button>
-                      </td>
-                      <td>{ p.username }</td>
-                    </tr>
-                  );
-                }) 
-              }
-            </tbody>
-          </Table>
-        );
-      }
-    }
-
-    function RenderStartMatch() {
-      const addPlayer = async (id) => {
-        const playersNew = [...players];
-        const index = playersNew.findIndex(p => p.id === id);
-        if(index === -1) return;
-        const participant = playersNew.splice(index, 1)[0];
-        setPlayers(playersNew);
-        console.log(participant);
-        
-        await dataTool(
-          "http://localhost:6969/stores/private-matches/joinMatch", 
-          { json: true, method: "POST", body: participant }
-        );
-        await updateParticipants();
-      }
-
-      return (
-        <div>
-          <Button
-            variant="secondary" 
-            style={{width:"100%"}}
-            onClick={startMatch}
-          > Start Match </Button>
-          <Table striped bordered hover style={{marginTop:"5%"}}>
-            <tbody>
-              {
-                players.map(p => {
-                  return (
-                    <tr>
-                      <td className="participants-btn-td">
-                        <Button 
-                          variant="outline-success" 
-                          onClick={() => addPlayer(p.id)}
-                        > ← </Button>
-                      </td>
-                      <td>{p.username}</td>
-                    </tr>
-                  )
-                })
-              }
-            </tbody>
-          </Table>
-        </div>
-      );
-    }
-
-    async function startMatch() {
-      await dataTool("http://localhost:6969/stores/private-matches/startMatch", { json:true });
-      await updateAll();
-    }
-
-    async function updateAll() {
-      return await dataTool(
-        "http://localhost:6969/stores/private-matches", 
-        { json:true }).then((data) => {
-          setMatchInfo({
-            username: data.match.username,
-            password: data.match.password,
-            subsOnly: data.match.subsOnly
-          });
-          setParicipants(data.participants);
-          setPlayers(data.players);
+        function newPassword() {
+            return socket.emit("newPassword", { password: newMatch.password });
         }
+
+        return (
+          <div>
+            <Table striped bordered hover>
+              <tbody>
+                <tr>
+                  <td style={{width:"2%"}}>Username</td>
+                  <td>{ match?.username }</td>
+                </tr>
+                <tr>
+                  <td style={{width:"2%"}}>Password</td>
+                  <td>{ match?.password }</td>
+                </tr>
+                <tr>
+                  <td style={{width:"2%"}}>Type</td>
+                  <td>{ match?.subsOnly ? "Subscribers only" : "Everyone" }</td>
+                </tr>
+              </tbody>
+            </Table>
+            <Button 
+              variant="secondary" 
+              type="button"
+              onClick={newPassword} 
+              style={{width:"100%"}}
+            > New Password </Button>
+          </div>
+        );
+    }
+
+    function RenderQueue() {
+        const removeParticipant = async (id) => {
+            const participant = await queue.find(p => p.id === id);
+            if(!participant) return;
+            const newRemovedQueue = [ ...removedQueue ];
+            newRemovedQueue.push(participant);
+            setRemovedQueue(newRemovedQueue);
+            socket.emit("leaveQueue", { id });
+        }
+
+        const addParticipant = async (id) => {
+            const newRemovedQueue = [ ...removedQueue ];
+            const index = newRemovedQueue.findIndex(p => p.id === id);
+            if(index === -1) return;
+            const participant = await newRemovedQueue.splice(index, 1)[0];
+            setRemovedQueue(newRemovedQueue);
+            socket.emit("joinQueue", participant);
+        }
+        
+        return (
+          <div>
+            <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
+              <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("getData", { queue: true })}> Refresh </Button>
+              <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", { queue: [] })} > Clear </Button>
+            </ButtonGroup>
+
+            <ButtonGroup aria-label="Basic example" style={{width:"100%",  marginTop:"5%", marginBottom:"5%"}}>
+              <Button variant="outline-success" style={{width:"50%"}} onClick={() => setQueueDisplayType(true)}> 
+                Active { queue?.length > 0 && ` (${queue.length})`}
+              </Button>
+              <Button variant="outline-danger" style={{width:"50%"}} onClick={() => setQueueDisplayType(false)}> 
+                Removed { removedQueue?.length > 0 && ` (${removedQueue.length})`}
+              </Button>
+            </ButtonGroup>
+
+            { queueDisplayType 
+              ? queue?.length > 0 && 
+                <div style={{overflowY: "scroll", maxHeight:`${62 * 5 + 6}px`}}>
+                  { QueueTable() } 
+                </div>
+              : removedQueue?.length > 0 &&
+                <div style={{overflowY: "scroll", maxHeight:`${62 * 5 + 6}px`}}>
+                  { RemovedQueueTable() } 
+                </div>
+            }
+
+          </div>
+        );
+
+        function QueueTable() {
+          return (
+            <Table striped bordered hover>
+              <tbody>
+                { 
+                  queue.map((p, i) => {
+                    return (
+                      <tr>
+                        <td className="participants-btn-td">
+                          <Button 
+                            variant="outline-danger" 
+                            onClick={() => removeParticipant(p.id)}
+                          > X </Button>
+                        </td>
+                        <td>{ p.username }</td>
+                      </tr>
+                    );
+                  })
+                }
+              </tbody>
+            </Table>
+          );
+        }
+    
+        function RemovedQueueTable() {
+          return (
+            <Table striped bordered hover>
+              <tbody>
+                { 
+                removedQueue.map((p, i) => {
+                    return (
+                      <tr>
+                        <td className="participants-btn-td">
+                          <Button 
+                            variant="outline-success" 
+                            onClick={() => addParticipant(p.id)}
+                          > ✓ </Button>
+                        </td>
+                        <td>{ p.username }</td>
+                      </tr>
+                    );
+                  }) 
+                }
+              </tbody>
+            </Table>
+          );
+        }
+    }
+
+    function RenderActiveMatch() {
+        const readdParticipant = async (id) => {
+            const participant = activeMatch?.players.find(p => p.id == id);
+            const hasParticipant = queue.find(p => p.id == id);
+            if(!participant || hasParticipant) return;
+            socket.emit("joinQueue", participant);
+        }
+
+        return (
+          <div>
+            <Button
+              variant="secondary" 
+              style={{ width: "100%" }}
+              onClick={ () => socket.emit("startMatch") }
+              disabled={ !match?.username || !match?.password || (typeof match?.subsOnly !== "boolean") }
+            > Start Match </Button>
+
+            { activeMatch?.username && activeMatch?.password &&
+              <Table striped bordered hover style={{marginTop:"5%"}}>
+                <tbody>
+                  <tr>
+                    <td style={{width:"2%"}}>Username</td>
+                    <td>{ activeMatch?.username }</td>
+                  </tr>
+                  <tr>
+                    <td style={{width:"2%"}}>Password</td>
+                    <td>{ activeMatch?.password }</td>
+                  </tr>
+                  <tr>
+                    <td style={{width:"2%"}}>Type</td>
+                    <td>{ activeMatch?.subsOnly ? "Subscribers only" : "Everyone" }</td>
+                  </tr>
+                </tbody>
+              </Table>
+            }
+
+            { activeMatch?.players &&
+              <Table striped bordered hover style={{marginTop:"5%"}}>
+                <tbody>
+                  { 
+                    activeMatch.players.map(p => {
+                      return (
+                        <tr>
+                          <td className="participants-btn-td">
+                            <Button 
+                              variant="outline-success" 
+                              onClick={(e) => {
+                                readdParticipant(p.id);
+                                e.target.disabled = true;
+                              }}
+                            > ← </Button>
+                          </td>
+                          <td>{p.username}</td>
+                        </tr>
+                      )
+                    })
+                  }
+                </tbody>
+              </Table>
+            }
+          </div>
+        );
+    }
+
+    function CardColumn(params) {
+      const { content, title } = params;
+      return (
+        <Col className="r-col">
+          <Card>
+            <Card.Header>{ title }</Card.Header>
+            <Card.Body>{ content }</Card.Body>
+          </Card>
+        </Col>
       );
     }
 
-    async function updateParticipants() {
-      return await dataTool(
-        "http://localhost:6969/stores/private-matches/getParticipants", 
-        { json: true }
-      ).then((data) => {
-        setParicipants(data.participants);
-      });
-    }
-
-    async function clearParticipants() {
-      await dataTool(
-        "http://localhost:6969/stores/private-matches/setParticipants", 
-        { json: true, method: "POST", body: { participants: [] } }
+    function ErrorAlert(params) {
+      const { target } = params;
+      return (
+        <Overlay target={ target } show={ alert?.show } placement="right-start">
+          <Alert 
+            variant="danger" 
+            onClose={() => setAlert({ show: false, info: "" })} 
+            dismissible
+            style={{height: "5%", paddingTop:"1%"}}
+          >
+            <h5>{ alert?.info }</h5>
+          </Alert>
+        </Overlay>
       );
-      await updateParticipants();
-      setRemovedParicipants([]);
-    }
-
-    async function dataTool(url, {json, headers, method, body}) {
-        return new Promise(function (resolve, reject) {
-          request({
-              headers: headers ? headers : {},
-              uri: url,
-              method: method ? method : "GET",
-              json: json ? json : true,
-              body: body ? body : {}
-          }, function (error, res, body) {
-              if (!error && res.statusCode === 200) resolve(body);
-              else reject(error);
-          });
-        });
-    }
-
-    async function updateMatchInfo(e) {
-      if(e) await e.preventDefault();
-      await dataTool( "http://localhost:6969/stores/private-matches/createMatch", 
-        { json: true, method: "POST", body: {
-        username: matchUsername,
-        password: matchPassword,
-        subsOnly: matchSubs,
-        length: passwordLength
-      }});
-      await updateAll();
-    }
-
-    async function updatePassword() {
-      await dataTool( "http://localhost:6969/stores/private-matches/updatePassword", 
-        { json: true, method: "POST", body: {
-        password: matchPassword,
-        length: passwordLength
-      }});
-      await updateAll();
-    }
-
-    function socketRequest(request, data) {
-      if(!request) return;
-      request = request.toUpperCase();
-      const reqBody = { request };
-      if(data) reqBody.data = data;
-      return socket.send(JSON.stringify(reqBody));
     }
 }
 

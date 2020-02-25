@@ -1,26 +1,23 @@
 import React, { useState, useEffect  } from 'react';
-import { Container, Row, Button, ButtonGroup, Collapse, Input, InputGroup,  FormControl} from 'react-bootstrap';
-import Main from "./Main";
+import { Button, InputGroup,  FormControl} from 'react-bootstrap';
+import Routes from "./Routes";
+import { useCookies } from 'react-cookie';
+import io from 'socket.io-client';
 
 function App() {
-  const pwd = require("../config.json").password;
   const [load, setLoad] = useState(false);
-  const [logedIn, setLogedIn] = useState(false);
   const [password, setPassword] = useState(null);
-  const BASE_URL = process.env.REACT_APP_BASE_URL;
-  console.log(BASE_URL);
-
+  const [cookies, setCookie] = useCookies(['login']);
   useEffect(() => {
     console.log("load");
-    
   }, [load]);
   
   return (
-    <div>
-      {/*{ logedIn ? (<Main />) : logInPage() }*/}
-      <Main />
-    </div>    
-    // <Main />
+    // <div>
+    //   { cookies?.login?.password ? (<Routes cookies={cookies} />) : logInPage() }
+    // </div>    
+    // <Routes />
+    <Routes cookies={cookies} />
   );
 
   function logInPage() {
@@ -42,8 +39,8 @@ function App() {
     );
   }
 
-  function checkPassword() {
-    setLogedIn(true);
+  async function checkPassword() {
+    return true;
   }
 }
 

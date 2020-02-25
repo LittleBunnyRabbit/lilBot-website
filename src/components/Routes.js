@@ -2,17 +2,18 @@ import React, { useState, useEffect  } from 'react';
 import { Container, NavDropdown, Row, Button, ButtonGroup, Collapse, Tabs , Tab, Navbar, Nav, FormControl, Form } from 'react-bootstrap';
 import "../css/App.css";
 import "../css/Main.css";
-import PrivateMatch from "./PrivateMatchNew";
+import PrivateMatch from "./PrivateMatch";
 import Tournament from "./Tournament";
 import OneVOne from "./OneVOne";
 import Home from "./Home";
+import Marbles from "./Marbles"
 import {
     BrowserRouter as Router,
     Switch,
     Route
 } from "react-router-dom";
 
-function Main() {
+function Routes(props) {
     useEffect(() => {
       console.log("App");
     });
@@ -37,22 +38,28 @@ function Main() {
                         <NavDropdown.Item href="/twitch-contest"> Contest </NavDropdown.Item>
                         <NavDropdown.Item href="/twitch-poll"> Poll </NavDropdown.Item>
                     </NavDropdown>
+                    {/* Miscellaneous */}
+                    <NavDropdown title="Miscellaneous" id="Miscellaneous">
+                        <NavDropdown.Item href="/misc-marbles"> Marbles </NavDropdown.Item>
+                    </NavDropdown>
                 </Nav>
             </Navbar>
 
             <Switch>
-                <Route path="/home"><Home /></Route>
+                <Route path="/home"><Home cookies={props.cookies} /></Route>
                 {/* Rocket League */}
-                <Route path="/rl-private-match"><PrivateMatch /></Route>
-                <Route path="/rl-tournament"><Tournament /></Route>
-                <Route path="/rl-1v1"><OneVOne /></Route>
+                <Route path="/rl-private-match"><PrivateMatch cookies={props.cookies} /></Route>
+                <Route path="/rl-tournament"><Tournament cookies={props.cookies} /></Route>
+                <Route path="/rl-1v1"><OneVOne cookies={props.cookies} /></Route>
                 {/* Discord */}
                 <Route path="/discord-status"><h1>Status</h1></Route>
                 {/* Twitch */}
                 <Route path="/twitch-contest"><h1>Status</h1></Route>
+                {/* Miscellaneous */}
+                <Route path="/misc-marbles"><Marbles/></Route>
             </Switch>
         </Router>
     );
 }
 
-export default Main;
+export default Routes;
