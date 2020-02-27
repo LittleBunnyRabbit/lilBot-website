@@ -2,7 +2,7 @@ import React, { useState, useEffect  } from 'react';
 import { Row, Button, Col, Table, Form, Container, Card, ProgressBar } from 'react-bootstrap';
 import request from "request";
 
-function Marbles() {
+function CoinFlip() {
     const [coinValue, setCoinValue] = useState(false);
     const maxPunishment = 1000000;
 
@@ -64,4 +64,4 @@ function Marbles() {
     );
 }
 
-export default Marbles;
+export default CoinFlip;
