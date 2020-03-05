@@ -7,7 +7,7 @@ import {
     InputGroup, FormControl, Jumbotron 
   } from 'react-bootstrap';
 
-const socket = io("http://localhost:2513/tournament", { 
+const socket = io("http://localhost:7777/tournament", { 
     query: { username: "abc", password: 12312 } 
 });   
 

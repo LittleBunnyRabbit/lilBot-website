@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Alert, Overlay, Row, Button, 
-  ButtonGroup, Col, Card, Table, 
-  Form, Container, Tabs, Tab, 
-  InputGroup, FormControl, Jumbotron,
-  ToggleButton, ToggleButtonGroup
+  Row, Button, ButtonGroup, Table, 
+  Container, InputGroup, FormControl
 } from 'react-bootstrap';
 import "../../css/PrivateMatch.css";
 import io from 'socket.io-client';
@@ -12,7 +9,7 @@ import ErrorAlert from "../common/ErrorAlert";
 import CardColumn from "../common/CardColumn";
 import Queue from "../common/Queue";
 
-const socket = io("http://localhost:2513/private-match", { 
+const socket = io("http://localhost:7777/rl/privateMatch", { 
   query: { username: "abc", password: 12312 } 
 });  
 
@@ -21,10 +18,9 @@ function PrivateMatch(props) {
 
     const [match, setMatch] = useState({});
     const [activeMatch, setActiveMatch] = useState([]);
-    const [queue, setQueue] = useState([]);
+    const [queue, setQueue] = useState({});
     const [canJoin, setCanJoin] = useState(false);
     const [newMatch, setNewMatch] = useState({ subsOnly: false });
-    const [removedQueue, setRemovedQueue] = useState([]);
 
     const [alert, setAlert] = useState({ show: false, info: "" });  
 
@@ -35,47 +31,37 @@ function PrivateMatch(props) {
         socket.on("canJoin", (data) => !!data && setCanJoin(data));
         socket.on("reqError", (data) => !!data && setAlert({ show: true, info: data.error }));
 
-        socket.emit("getData", [ "match", "activeMatch", "queue", "canJoin" ]);
+        socket.emit("getData", {
+          match: true, activeMatch: true, queue: true
+        });
     }, [loadData]);
 
     function makeDummyQueue() {
         socket.emit("setData", {
-          queue: [
-            { username: "Player 1",  isSub: true,  id:"1"},
-            { username: "Player 2",  isSub: false, id:"2"},
-            { username: "Player 3",  isSub: true,  id:"4"},
-            { username: "Player 4",  isSub: true,  id:"5"},
-            { username: "Player 5",  isSub: false, id:"6"},
-            { username: "Player 6",  isSub: false, id:"7"},
-            { username: "Player 7",  isSub: true,  id:"8"},
-            { username: "Player 8",  isSub: true,  id:"9"},
-            { username: "Player 9",  isSub: false, id:"10"},
-            { username: "Player 10", isSub: true,  id:"11"},
-            { username: "Player 11", isSub: true,  id:"12"},
-            { username: "Player 12", isSub: true,  id:"13"},
-            { username: "Player 13", isSub: false, id:"14"},
-            { username: "Player 14", isSub: true,  id:"15"},
-            { username: "Player 15", isSub: false, id:"160"}
-          ]
+          queue: {
+            options: {
+              subscriber: false,
+              moderator: false
+            },
+            participants: [
+              { username: "Player 1",  moderator: true, subscriber: false, id:"1"},
+              { username: "Player 2",  moderator: false, subscriber: true, id:"2"},
+              { username: "Player 3",  moderator: true,  subscriber: false, id:"4"},
+              { username: "Player 4",  moderator: true,  subscriber: true, id:"5"},
+              { username: "Player 5",  moderator: false, subscriber: true, id:"6"},
+              { username: "Player 6",  moderator: false, subscriber: false, id:"7"},
+              { username: "Player 7",  moderator: true,  subscriber: false, id:"8"},
+              { username: "Player 8",  moderator: true,  subscriber: true, id:"9"},
+              { username: "Player 9",  moderator: false, subscriber: false, id:"10"},
+              { username: "Player 10", moderator: true,  subscriber: true, id:"11"},
+              { username: "Player 11", moderator: true,  subscriber: false, id:"12"},
+              { username: "Player 12", moderator: true,  subscriber: true, id:"13"},
+              { username: "Player 13", moderator: false, subscriber: false, id:"14"},
+              { username: "Player 14", moderator: true,  subscriber: true, id:"15"},
+              { username: "Player 15", moderator: false, subscriber: true, id:"160"}
+            ]
+          }
         })
-
-        setQueue([
-          { username: "Player 1",  isSub: true,  id:"1",  isMod: false },
-          { username: "Player 2",  isSub: false, id:"2",  isMod: false },
-          { username: "Player 3",  isSub: true,  id:"4",  isMod: false },
-          { username: "Player 4",  isSub: true,  id:"5",  isMod: false },
-          { username: "Player 5",  isSub: false, id:"6",  isMod: false },
-          { username: "Player 6",  isSub: false, id:"7",  isMod: false },
-          { username: "Player 7",  isSub: true,  id:"8",  isMod: false },
-          { username: "Player 8",  isSub: true,  id:"9",  isMod: false },
-          { username: "Player 9",  isSub: false, id:"10", isMod: false },
-          { username: "Player 10", isSub: true,  id:"11", isMod: false },
-          { username: "Player 11", isSub: true,  id:"12", isMod: false },
-          { username: "Player 12", isSub: true,  id:"13", isMod: false },
-          { username: "Player 13", isSub: false, id:"14", isMod: false },
-          { username: "Player 14", isSub: true,  id:"15", isMod: false },
-          { username: "Player 15", isSub: false, id:"16", isMod: false }
-        ])
     }
 
     return (
@@ -83,16 +69,16 @@ function PrivateMatch(props) {
         <br/>
         <ErrorAlert target={ this } alert={ alert } setAlert={ setAlert }/>
 
-        <Row className="r-row">
+        {/* <Row className="r-row">
           <CardColumn title="Create" content={ <RenderCreateMatch /> } />
           <CardColumn title="Match" content={ <RenderMatchInfo /> } />
-        </Row>  
+        </Row>   */}
 
         <br/>
 
         <Row className="r-row">
           <CardColumn title="Queue" content={ <RenderQueue /> } />
-          <CardColumn title="Active Match" content={ <RenderActiveMatch /> } />
+          {/* <CardColumn title="Active Match" content={ <RenderActiveMatch /> } /> */}
         </Row>
 
         <br/><br/><br/>
@@ -201,16 +187,11 @@ function PrivateMatch(props) {
     function RenderQueue() {
         return (
           <div>
-            <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
-              <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("getData", [ "queue" ])}> Refresh </Button>
-              <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", { queue: [] })} > Clear </Button>
-            </ButtonGroup>
-
-            <br /><br />
-
-            <Queue queue={ queue }
-                  joinQueue={ (participant) => socket.emit("joinQueue", participant) }
-                  leaveQueue={ (id) => socket.emit("leaveQueue", { id }) }/>
+            <Queue queue={ queue.participants }
+                   options={ queue.options }
+                   joinQueue={ (participant) => socket.emit("joinQueue", participant) }
+                   leaveQueue={ (id) => socket.emit("leaveQueue", { id }) }
+                   updateOptions={ (options) => socket.emit("updateOptions", options) }/>
           </div>
         );
     }

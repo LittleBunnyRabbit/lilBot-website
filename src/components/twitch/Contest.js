@@ -55,21 +55,6 @@ function Contest() {
         
         return (
           <div>
-            <ToggleButtonGroup 
-              type="checkbox" 
-              value={ queueOptions } 
-              style={{ width:"100%" }} 
-              onChange={value => setQueueOptions(value)}
-            >
-              <ToggleButton value="subs" variant="outline-dark" style={{ width:"34%" }}> 
-                Subs
-              </ToggleButton>
-              <ToggleButton value="mods" variant="outline-dark" style={{ width:"34%" }}> 
-                Mods 
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <br /><br />
-
             <Queue queue={ queue } joinQueue={null} leaveQueue={null}
                   filters={[
                     ["isMod", queueOptions.includes("mods")],
@@ -82,8 +67,15 @@ function Contest() {
     function DrawWinner(props) {
         return (
           <div >
-            <Card >
-              <Card.Body style={{ maxHeight: "100px", overflowY: "scroll", paddingTop:"10px", paddingBottom:"10px" }}>
+            <Button 
+              variant="secondary" 
+              type="button"
+              style={{width:"100%", marginBottom: "5%"}}
+              disabled={ queue?.length < 1 }
+            > Submit </Button>
+
+            <Card style={{minHeight: "500px"}}>
+              <Card.Body style={{ overflowY: "scroll", paddingTop:"10px", paddingBottom:"10px" }}>
                 <ul style={{ listStyleType: "none", paddingLeft: 0, paddingRight: 0, maxWidth:"inherit", display: "inline-block" }}>
                   { !!messages && !!winner &&
                     messages.map(m => (

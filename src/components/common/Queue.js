@@ -6,29 +6,66 @@ function Queue(props) {
     const [ qTable, setQTable ] = useState([ "active" ]);
     const [ qRemoved, setQRemoved ] = useState([]);
 
-    const { queue, joinQueue, leaveQueue, filters } = props;
-
+    const { joinQueue, leaveQueue, updateOptions, queue, options } = props;
+    const [optionsBtns, setOptionsBtns] = useState([]);
     const [qFiltered, setQFiltered] = useState(queue);
-    const [qRemovedFiltered, setQRemovedFiltered] = useState(qRemoved);
+    // const [qRemovedFiltered, setQRemovedFiltered] = useState(qRemoved);
 
     useEffect(() => {
-      if(filters) {
-        const filter = (q) => (
-          q.filter(p => {
-            for(const f of filters) {
-                if(f[1] && !p[f[0]]) return false;
-            }
-            return true;
-          })
-        );
-        setQFiltered(filter(queue));
-        setQRemovedFiltered(filter(qRemoved));
-      }
+        if(options) {
+            console.log({ options });
+            
+            const op = [];
+            if(options.moderator) op.push("moderator");
+            if(options.subscriber) op.push("subscriber");
+            setOptionsBtns(op);
+        }
+        setQFiltered(filterQueue(queue));
+        setQRemoved(filterQueue(qRemoved));
     }, [load])
 
+    async function handeleOptionsChange(op) { 
+        setOptionsBtns(op);
+        await updateOptions({
+            subscriber: op.includes("subscriber"),
+            moderator: op.includes("moderator")
+        })
+        setQFiltered(filterQueue(queue));
+        setQRemoved(filterQueue(qRemoved));
+    }
+
+    function filterQueue(q) {
+        console.log({optionsBtns});
+        console.log({options});
+        if(!q) return q;
+        return q.filter(p => {
+          if(optionsBtns.includes("moderator") && !p.moderator) return false;
+          if(optionsBtns.includes("subscriber") && !p.subscriber) return false;
+          return true;
+        });
+    }
 
     return (
         <div>
+          <ToggleButtonGroup 
+            type="checkbox" 
+            style={{ width:"100%", marginBottom: "5%" }} 
+            value={optionsBtns} 
+            onChange={handeleOptionsChange}
+          >
+            <ToggleButton 
+              value="subscriber"
+              variant="outline-dark" 
+              style={{ width:"34%" }}
+            > Subs </ToggleButton>
+            <ToggleButton 
+              value="moderator"
+              variant="outline-dark" 
+              style={{ width:"34%" }}
+            > Mods </ToggleButton>
+          </ToggleButtonGroup>
+
+
           <ToggleButtonGroup 
             type="checkbox" 
             value={ qTable } 
@@ -42,7 +79,7 @@ function Queue(props) {
               Active { qFiltered?.length > 0 && ` (${qFiltered.length})`} 
             </ToggleButton>
             <ToggleButton value="removed" variant="outline-danger" style={{ width:"50%" }}> 
-              Removed { qRemovedFiltered?.length > 0 && ` (${qRemovedFiltered.length})`} 
+              Removed { qRemoved?.length > 0 && ` (${qRemoved?.length})`} 
             </ToggleButton>
           </ToggleButtonGroup>
 
@@ -56,7 +93,7 @@ function Queue(props) {
                               setQRemoved(qRemovedNew);
                               return leaveQueue(id);
                           }}/>    
-            : <QueueTable selectedQueue={ qRemovedFiltered } label="✓" variant="outline-success"                   
+            : <QueueTable selectedQueue={ qRemoved } label="✓" variant="outline-success"                   
                           onClick={ async (id) => {
                               const qRemovedNew = [ ...qRemoved ];
                               const index = qRemovedNew.findIndex(p => p.id === id);
@@ -72,9 +109,10 @@ function Queue(props) {
 
     function QueueTable(props) {
         let { selectedQueue } = props;
+
         const { label, variant, onClick } = props;
     
-        if(selectedQueue?.length < 1) return (
+        if(!selectedQueue || selectedQueue?.length < 1) return (
           <h4 style={{ textAlign:"center" }}> Empty Queue </h4> 
         );
     
@@ -93,8 +131,8 @@ function Queue(props) {
                             > { label } </Button>
                           </td>
                           <td>
-                            <p style={{ color: `${ p.isMod ? "green" : p.isSub ? "purple" : "black"}`}}>
-                              {p.isMod ? "⚔️ " : ""}{p.isSub ? "🥔 " : ""}{ p.username }
+                            <p style={{ color: `${ p.moderator ? "green" : p.subscriber ? "purple" : "black"}`}}>
+                              {p.moderator ? "⚔️ " : ""}{p.subscriber ? "🥔 " : ""}{ p.username }
                             </p>
                           </td>
                         </tr>
