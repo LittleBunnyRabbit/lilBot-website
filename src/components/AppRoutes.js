@@ -3,6 +3,7 @@ import PrivateMatch from "./rocketLeague/PrivateMatch";
 import Tournament from "./rocketLeague/Tournament";
 
 import Contest from "./twitch/Contest";
+import Poll from "./twitch/Poll";
 
 import CoinFlip from "./miscellaneous/CoinFlip";
 
@@ -51,7 +52,7 @@ export default [
             {
                 name: "Poll",
                 path: "/poll",
-                component: null
+                component: Poll
             }
         ]
     },

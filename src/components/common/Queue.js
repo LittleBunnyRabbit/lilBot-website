@@ -1,51 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Table, Button, ToggleButtonGroup, ToggleButton, Alert } from 'react-bootstrap';
 
 function Queue(props) {
     const [load, setLoad] = useState(null);
-    const { leaveQueue, updateOptions, queue, options } = props;
-    const [optionsBtns, setOptionsBtns] = useState([]);
-    const [qFiltered, setQFiltered] = useState(queue);
+    const { leaveQueue, queue, setFilters, filters } = props;
 
     useEffect(() => {
-        if(options) {
-            console.log({ options });
-            
-            const op = [];
-            if(options.moderator) op.push("moderator");
-            if(options.subscriber) op.push("subscriber");
-            setOptionsBtns(op);
-        }
-        setQFiltered(filterQueue(queue));
+      console.log("render");
+
     }, [load])
-
-    async function handeleOptionsChange(op) { 
-        setOptionsBtns(op);
-        await updateOptions({
-            subscriber: op.includes("subscriber"),
-            moderator: op.includes("moderator")
-        })
-        setQFiltered(filterQueue(queue));
-    }
-
-    function filterQueue(q) {
-        console.log({optionsBtns});
-        console.log({options});
-        if(!q) return q;
-        return q.filter(p => {
-          if(optionsBtns.includes("moderator") && !p.moderator) return false;
-          if(optionsBtns.includes("subscriber") && !p.subscriber) return false;
-          return true;
-        });
-    }
 
     return (
         <div>
           <ToggleButtonGroup 
             type="checkbox" 
-            style={{ width:"100%", marginBottom: "5%" }} 
-            value={optionsBtns} 
-            onChange={handeleOptionsChange}
+            style={{ width:"100%", marginBottom: "3%" }} 
+            value={filters} 
+            onChange={(f) => setFilters(f)}
           >
             <ToggleButton 
               value="subscriber"
@@ -58,8 +29,12 @@ function Queue(props) {
               style={{ width:"34%" }}
             > Mods </ToggleButton>
           </ToggleButtonGroup>
-
-          <QueueTable selectedQueue={ qFiltered } label="X" variant="outline-danger" onClick={ leaveQueue }/>   
+          { console.log("%cRENDERING QUEUE", "font-size: 20px; background: white;") }
+          <QueueTable selectedQueue={ queue.filter(p => {
+              for(const f of filters)  if(!p[f]) return false;
+              return true;
+            })} 
+            label="X" variant="outline-danger" onClick={ leaveQueue }/>   
         </div>
     );
 
@@ -73,30 +48,35 @@ function Queue(props) {
         );
     
         return (
-          <div style={{ overflowY: "scroll", maxHeight:`${62 * 8 + 6}px` }}>
-            <Table striped bordered>
-              <tbody>
-                { 
-                  selectedQueue.map((p, i) => {
-                      return (
-                        <tr>
-                          <td className="participants-btn-td">
-                            <Button 
-                              variant={ variant }
-                              onClick={() => onClick(p.id)}
-                            > { label } </Button>
-                          </td>
-                          <td>
-                            <p style={{ color: `${ p.moderator ? "green" : p.subscriber ? "purple" : "black"}`}}>
-                              {p.moderator ? "⚔️ " : ""}{p.subscriber ? "🥔 " : ""}{ p.username }
-                            </p>
-                          </td>
-                        </tr>
-                      );
-                  })
-                }
-              </tbody>
-            </Table>
+          <div>
+            <Alert variant="secondary">
+              <b>{ selectedQueue?.length }</b> participants
+            </Alert>
+            <div style={{ overflowY: "scroll", maxHeight:`${62 * 7 + 6}px` }}>
+              <Table striped bordered>
+                <tbody>
+                  { 
+                    selectedQueue.map((p, i) => {
+                        return (
+                          <tr>
+                            <td className="participants-btn-td">
+                              <Button 
+                                variant={ variant }
+                                onClick={() => onClick(p.id)}
+                              > { label } </Button>
+                            </td>
+                            <td>
+                              <p style={{ color: `${ p.moderator ? "green" : p.subscriber ? "purple" : "black"}`}}>
+                                {p.moderator ? "⚔️ " : ""}{p.subscriber ? "🥔 " : ""}{ p.username }
+                              </p>
+                            </td>
+                          </tr>
+                        );
+                    })
+                  }
+                </tbody>
+              </Table>
+            </div>
           </div>
         );
     }
