@@ -1,9 +1,10 @@
 import React, { useState, useEffect  } from 'react';
-import { Row, Button, Col, Table, Form, Container, Card, ProgressBar } from 'react-bootstrap';
+import { Row, Button, Col, Spinner, Form, Container, Card, ProgressBar } from 'react-bootstrap';
 import request from "request";
 
 function CoinFlip() {
     const [coinValue, setCoinValue] = useState(false);
+    const [spinner, setSpinner] = useState(null);
     const maxPunishment = 1000000;
 
     const RenderTails = () => {
@@ -50,13 +51,19 @@ function CoinFlip() {
                         variant="dark" 
                         onClick={() => {
                             const coin = Math.random() <= 0.5;
-                            setCoinValue(coin);
+                            setSpinner(true);
+                            setTimeout(() => {
+                                setSpinner(false);
+                                setCoinValue(coin);
+                            }, 1000);
+
                     }}>Punish</Button>
                 </Card.Header>
                 <Card.Body>
-                    { !coinValue && RenderTails() }
-                    { coinValue && RenderHeads() }
-
+                    {   spinner !== null && (
+                        spinner ? <Spinner animation="border" size="sm" /> :
+                        coinValue ? <RenderTails /> : <RenderHeads />)
+                    }
                 </Card.Body>
             </Card>
 
