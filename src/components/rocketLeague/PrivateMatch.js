@@ -69,23 +69,23 @@ function PrivateMatch(props) {
         <br/>
         <ErrorAlert target={ this } alert={ alert } setAlert={ setAlert }/>
 
-        {/* <Row className="r-row">
+        <Row className="r-row">
           <CardColumn title="Create" content={ <RenderCreateMatch /> } />
           <CardColumn title="Match" content={ <RenderMatchInfo /> } />
-        </Row>   */}
+        </Row>  
 
         <br/>
 
         <Row className="r-row">
           <CardColumn title="Queue" content={ <RenderQueue /> } />
-          {/* <CardColumn title="Active Match" content={ <RenderActiveMatch /> } /> */}
+          <CardColumn title="Active Match" content={ <RenderActiveMatch /> } />
         </Row>
 
         <br/><br/><br/>
 
         <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
           <Button variant="secondary" style={{width:"50%"}} onClick={makeDummyQueue}> DUMMY </Button>
-          <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", {activeMatch: {}})}> Clear Match </Button>
+          <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", {queue: {}})}> Clear Match </Button>
         </ButtonGroup>
       </Container>
     );

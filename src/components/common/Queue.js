@@ -3,13 +3,9 @@ import { Table, Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap'
 
 function Queue(props) {
     const [load, setLoad] = useState(null);
-    const [ qTable, setQTable ] = useState([ "active" ]);
-    const [ qRemoved, setQRemoved ] = useState([]);
-
-    const { joinQueue, leaveQueue, updateOptions, queue, options } = props;
+    const { leaveQueue, updateOptions, queue, options } = props;
     const [optionsBtns, setOptionsBtns] = useState([]);
     const [qFiltered, setQFiltered] = useState(queue);
-    // const [qRemovedFiltered, setQRemovedFiltered] = useState(qRemoved);
 
     useEffect(() => {
         if(options) {
@@ -21,7 +17,6 @@ function Queue(props) {
             setOptionsBtns(op);
         }
         setQFiltered(filterQueue(queue));
-        setQRemoved(filterQueue(qRemoved));
     }, [load])
 
     async function handeleOptionsChange(op) { 
@@ -31,7 +26,6 @@ function Queue(props) {
             moderator: op.includes("moderator")
         })
         setQFiltered(filterQueue(queue));
-        setQRemoved(filterQueue(qRemoved));
     }
 
     function filterQueue(q) {
@@ -65,45 +59,7 @@ function Queue(props) {
             > Mods </ToggleButton>
           </ToggleButtonGroup>
 
-
-          <ToggleButtonGroup 
-            type="checkbox" 
-            value={ qTable } 
-            style={{ width: "100%", marginBottom: "5%" }}
-            onChange={value => {
-                value = value.filter(v => !qTable.includes(v));
-                setQTable(value)
-            }}
-          >
-            <ToggleButton value="active" variant="outline-success" style={{ width:"50%" }}> 
-              Active { qFiltered?.length > 0 && ` (${qFiltered.length})`} 
-            </ToggleButton>
-            <ToggleButton value="removed" variant="outline-danger" style={{ width:"50%" }}> 
-              Removed { qRemoved?.length > 0 && ` (${qRemoved?.length})`} 
-            </ToggleButton>
-          </ToggleButtonGroup>
-
-          { qTable.includes("active")
-            ? <QueueTable selectedQueue={ qFiltered } label="X" variant="outline-danger"
-                          onClick={ async (id) => {
-                              const participant = await queue.find(p => p.id === id);
-                              if(!participant) return;
-                              const qRemovedNew = [ ...qRemoved ];
-                              qRemovedNew.push(participant);
-                              setQRemoved(qRemovedNew);
-                              return leaveQueue(id);
-                          }}/>    
-            : <QueueTable selectedQueue={ qRemoved } label="✓" variant="outline-success"                   
-                          onClick={ async (id) => {
-                              const qRemovedNew = [ ...qRemoved ];
-                              const index = qRemovedNew.findIndex(p => p.id === id);
-                              if(index === -1) return;
-                              const participant = await qRemovedNew.splice(index, 1)[0];
-                              if(!participant) return;
-                              setQRemoved(qRemovedNew);
-                              return joinQueue(participant);
-                          }}/>   
-          }
+          <QueueTable selectedQueue={ qFiltered } label="X" variant="outline-danger" onClick={ leaveQueue }/>   
         </div>
     );
 
