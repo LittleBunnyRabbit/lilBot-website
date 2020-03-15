@@ -1,9 +1,13 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import { Container, Row, Alert, Button, ToggleButtonGroup, ToggleButton, Card } from 'react-bootstrap';
-
+import io from 'socket.io-client';
 import ErrorAlert from "../common/ErrorAlert";
 import CardColumn from "../common/CardColumn";
 import Queue from "../common/Queue";
+
+const socket = io(`${process.env.REACT_APP_BASE_URL}/twitch/contest`, { 
+  query: { username: "abc", password: 12312 } 
+}); 
 
 function Contest() {
     const [load, setLoad] = useState(null);
@@ -12,66 +16,34 @@ function Contest() {
     const [messages, setMessages] = useState([]);
     const [winner, setWinner] = useState({});
     const [filters, setFilters] = useState([]);
+    const [alert, setAlert] = useState({ show: false, info: "" });  
+
+    const queueRef = useRef(null);
 
     useEffect(() => {
-      setMessages([
-        "This is my first msg", 
-        "Wow my seconds msg!",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-        "This is a super long msg because i need to test if it will overflow into the next line or it will just break everything like it did before...",
-      ]);
-      setWinner({
-        username: "lilBunane", subscriber: true, moderator: true, id:"1"
-      });
-      setQueue([
-        { username: "Player_1", subscriber: false, moderator: true, id:"1"},
-        { username: "Player_2", subscriber: false, moderator: false, id:"2"},
-        { username: "Player_3", subscriber: true, moderator: false, id:"4"},
-        { username: "Player_4", subscriber: true, moderator: true, id:"5"},
-        { username: "Player_5", subscriber: false, moderator: false, id:"6"},
-        { username: "Player_6", subscriber: false, moderator: true, id:"7"},
-        { username: "Player_7", subscriber: true, moderator: true, id:"8"},
-        { username: "Player_8", subscriber: true, moderator: true, id:"9"},
-        { username: "Player_9", subscriber: false, moderator: false, id:"10"},
-        { username: "Player_10", subscriber: true, moderator: true, id:"11"},
-        { username: "Player_11", subscriber: true, moderator: false, id:"12"},
-        { username: "Player_12", subscriber: true, moderator: true, id:"13"},
-        { username: "Player_13", subscriber: false, moderator: false, id:"14"},
-        { username: "Player_14", subscriber: true, moderator: true, id:"15"},
-        { username: "Player_15", subscriber: false, moderator: true, id:"160"}
-      ]);
+      socket.on("messages", (data) => !!data && setMessages(data));
+      socket.on("winner", (data) => !!data && setWinner(data));
+      socket.on("queue", (data) => !!data && setQueue(data));
+      socket.on("filters", (data) => !!data && setFilters(data));
+      socket.on("reqError", (data) => !!data && setAlert({ show: true, info: data.error }));
+
+      socket.emit("getData", {
+        messages: true, winner: true, queue: true, filters: true
+      })
     }, [load]);
 
     return (
       <Container>
         <br />
+        <ErrorAlert target={ this } alert={ alert } setAlert={ setAlert }/>
         <Row className="r-row">
-          <CardColumn content={ <ContestQueue /> }/>
+          <CardColumn content={ <ContestQueue /> } style={{ width: "50%" }} ref={queueRef}/>
           <CardColumn content={ <DrawWinner /> }/>
         </Row> 
       </Container>
     );
 
     function ContestQueue(props) {
-        console.log(queueOptions);
-        
         return (
           <div>
             <Button 
@@ -79,46 +51,50 @@ function Contest() {
               type="button"
               style={{width:"100%", marginBottom: "5%"}}
               disabled={ queue?.length < 1 }
-              onClick={ () => setWinner(queue[Math.floor(Math.random() * queue.length)]) }
+              onClick={ () => socket.emit("drawWinner") }
             > DRAW </Button>
 
            <Queue queue={ queue }
-                  // leaveQueue={ (id) => socket.emit("leaveQueue", { id }) }
                   leaveQueue={ (id) => console.log(id) }
                   filters={ filters }
-                  setFilters={ setFilters }
-                  />
+                  setFilters={(filters) => socket.emit("setData", { filters })}/>
           </div>
         );
     }
 
     function DrawWinner(props) {
         return (
-          <div >
+          <div>
           <Alert variant="secondary">
             <span style={{ color: `${ winner?.moderator ? "green" : winner?.subscriber ? "purple" : "black"}`, fontWeight: "700"}}>
               {winner?.moderator ? "⚔️ " : ""}{winner?.subscriber ? "🥔 " : ""}{ winner?.username }
             </span>
           </Alert>
-            <Card style={{minHeight: "500px", maxHeight:"500px"}}>
+            <Card style={{ minHeight: "500px", maxHeight:"500px"}} >
               <Card.Body style={{ overflowY: "scroll", paddingTop:"10px", paddingBottom:"10px" }}>
-                <ul style={{ listStyleType: "none", paddingLeft: 0, paddingRight: 0, maxWidth:"inherit", display: "inline-block" }}>
+                <ul style={{ listStyleType: "none", paddingLeft: 0, paddingRight: 0, display: "inline-block" }}>
                   { !!messages && !!winner &&
                     messages.map(m => (
-                      <li style={{ display: "inline-flex", flexDirection: "row" }}>
-                        <span style={{ 
-                          color: `${ winner?.moderator ? "green" : winner?.subscriber ? "purple" : "black"}`, 
-                          paddingRight: "10px", 
-                          fontWeight: "bold", 
-                          flex: "1" 
-                        }}>
-                          { winner?.username }:
-                        </span>
-                        <span>{m}</span>
-                      </li>
+                      <div>
+                        <li style={{ display: "inline-flex", flexDirection: "row" }}>
+                          <span style={{ 
+                            color: `${ winner?.moderator ? "green" : winner?.subscriber ? "purple" : "black"}`, 
+                            paddingRight: "10px", 
+                            fontWeight: "bold", 
+                            flex: "1",
+                          }}>
+                            { winner?.username }:
+                          </span>
+                          <span
+                            style={{ maxWidth: `${queueRef?.current?.clientWidth ? queueRef?.current?.clientWidth : "400"}px`}}
+                          >{m}</span>
+                        </li>
+                        <br />
+                      </div>
                     ))
                   }
                 </ul>
+                { console.log(queueRef) }
               </Card.Body>
             </Card>
           </div>

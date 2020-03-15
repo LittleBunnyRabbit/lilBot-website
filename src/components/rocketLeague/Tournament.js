@@ -4,10 +4,10 @@ import {
     Alert, Overlay, Row, Button, 
     ButtonGroup, Col, Card, Table, 
     Form, Container, Tabs, Tab, 
-    InputGroup, FormControl, Jumbotron 
-  } from 'react-bootstrap';
+    InputGroup, FormControl, Jumbotron, ToggleButtonGroup, ToggleButton
+} from 'react-bootstrap';
 
-const socket = io("http://localhost:7777/tournament", { 
+const socket = io(`${process.env.REACT_APP_BASE_URL}/rl/tournament`, { 
     query: { username: "abc", password: 12312 } 
 });   
 
@@ -16,6 +16,7 @@ function Trounament(props) {
     const [tournament, setTournament] = useState({});
     const [newTournament, setNewTournament] = useState({ subsOnly: false, name: "", password: "" }); 
     const [alert, setAlert] = useState({ show: false, info: "" });  
+    const [filters, setFilters] = useState([]);
 
     useEffect(() => {
       socket.on("tournament", (data) => {
@@ -36,8 +37,7 @@ function Trounament(props) {
             socket.emit("createTournament", { 
                 name: newTournament?.name, 
                 password: newTournament?.password, 
-                subsOnly: (typeof newTournament?.subsOnly == "boolean") && newTournament?.subsOnly, 
-                isOpen: false 
+                filters: filters
             });
         }
 
@@ -49,6 +49,7 @@ function Trounament(props) {
               </InputGroup.Prepend>
               <FormControl                 
                 value={newTournament?.name} 
+                style={{boxShadow: "none"}}
                 onChange={(e) => {
                   const nt = { ...newTournament }
                   nt.name = e.target.value;
@@ -62,6 +63,7 @@ function Trounament(props) {
               </InputGroup.Prepend>
               <FormControl 
                 value={newTournament?.password} 
+                style={{boxShadow: "none"}}
                 onChange={(e) => {
                   const nt = { ...newTournament }
                   nt.password = e.target.value;
@@ -70,22 +72,23 @@ function Trounament(props) {
                 placeholder="Auto Generated" 
               />
             </InputGroup>
-            <InputGroup className="mb-3">
-              <InputGroup.Prepend>
-                <InputGroup.Checkbox
-                  checked={newTournament?.subsOnly} 
-                  onChange={(e) => {
-                    const nt = { ...newTournament }
-                    nt.subsOnly = e.target.checked;
-                    setNewTournament(nt);
-                  }}
-                />
-              </InputGroup.Prepend>
-              <FormControl 
-                value={newTournament?.subsOnly ? "Subscribers only" : "Everyone"}
-                disabled
-              />
-            </InputGroup>
+            <ToggleButtonGroup 
+                type="checkbox" 
+                style={{ width:"100%", marginBottom: "3%" }} 
+                value={filters} 
+                onChange={(f) => setFilters(f)}
+            >
+                <ToggleButton 
+                    value="subscriber"
+                    variant="outline-dark" 
+                    style={{ width:"50%" }}
+                > Subs </ToggleButton>
+                <ToggleButton 
+                    value="moderator"
+                    variant="outline-dark" 
+                    style={{ width:"50%" }}
+                > Mods </ToggleButton>
+            </ToggleButtonGroup>
             <Button 
                 variant="secondary" 
                 type="button"
@@ -98,9 +101,11 @@ function Trounament(props) {
     }
 
     const RenderMatchInfo = () => {
+        console.log(tournament);
+        
         return (
           <div>
-            { tournament?.name && tournament?.password &&
+            { tournament?.name && tournament?.password && tournament?.filters &&
               <div>
                 <Table striped bordered hover>
                   <tbody>
@@ -113,22 +118,15 @@ function Trounament(props) {
                       <td>{ tournament?.password }</td>
                     </tr>
                     <tr>
-                      <td style={{width:"2%"}}>Type</td>
-                      <td>
-                          { (typeof tournament?.subsOnly === "boolean") && 
-                            tournament?.subsOnly ? "Subscribers only" : "Everyone" 
-                          }
-                      </td>
+                      <td style={{width:"2%"}}>Filters</td>
+                      <td>{ tournament?.filters.join(", ") }</td>
                     </tr>
                   </tbody>
                 </Table>
                 <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
-                  <Button variant="secondary" style={{width:"50%"}} onClick={ () => {
+                  <Button variant="secondary" style={{width:"100%"}} onClick={ () => {
                       socket.emit("deleteTournament");
                   }}> Remove </Button>
-                  <Button variant={tournament?.isOpen ? "success" : "danger"} style={{width:"50%"}} onClick={(e) => {                     
-                      socket.emit("changeIsOpen");
-                  }}> {tournament?.isOpen ? "Open" : "Closed"} </Button>
                 </ButtonGroup>
               </div>
             }

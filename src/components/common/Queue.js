@@ -21,15 +21,14 @@ function Queue(props) {
             <ToggleButton 
               value="subscriber"
               variant="outline-dark" 
-              style={{ width:"34%" }}
+              style={{ width:"50%" }}
             > Subs </ToggleButton>
             <ToggleButton 
               value="moderator"
               variant="outline-dark" 
-              style={{ width:"34%" }}
+              style={{ width:"50%" }}
             > Mods </ToggleButton>
           </ToggleButtonGroup>
-          { console.log("%cRENDERING QUEUE", "font-size: 20px; background: white;") }
           <QueueTable selectedQueue={ queue.filter(p => {
               for(const f of filters)  if(!p[f]) return false;
               return true;

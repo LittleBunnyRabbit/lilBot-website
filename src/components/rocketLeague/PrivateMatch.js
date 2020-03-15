@@ -8,11 +8,11 @@ import "../../css/PrivateMatch.css";
 import io from 'socket.io-client';
 import ErrorAlert from "../common/ErrorAlert";
 import CardColumn from "../common/CardColumn";
-import Queue from "../common/Queue";
+import Queue from "../common/Queue"; 
 
-const socket = io("http://localhost:7777/rl/privateMatch", { 
+const socket = io(`${process.env.REACT_APP_BASE_URL}/rl/privateMatch`, { 
   query: { username: "abc", password: 12312 } 
-});  
+}); 
 
 function PrivateMatch(props) {
     const [loadData, setLoadData] = useState(true);
@@ -21,6 +21,7 @@ function PrivateMatch(props) {
     const [activeMatch, setActiveMatch] = useState([]);
     const [queue, setQueue] = useState([]);
     const [filters, setFilters] = useState([]);
+    const [gamemode, setGamemode] = useState(null);
 
     const [alert, setAlert] = useState({ show: false, info: "" });  
 
@@ -31,15 +32,17 @@ function PrivateMatch(props) {
         socket.on("match", (data) => !!data && setMatch(data));
         socket.on("activeMatch", (data) => !!data && setActiveMatch(data));
         socket.on("queue", (data) => !!data && setQueue(data));
+        socket.on("filters", (data) => !!data && setFilters(data));
         socket.on("reqError", (data) => !!data && setAlert({ show: true, info: data.error }));
 
         socket.emit("getData", {
-          match: true, activeMatch: true, queue: true
+          match: true, activeMatch: true, queue: true, filters: true
         });
     }, [loadData]);
 
     function makeDummyQueue() {
-        const dummyQueue = [
+        socket.emit("setData", {
+          queue: [
             { username: "Player 1",  moderator: true, subscriber: false, id:"1"},
             { username: "Player 2",  moderator: false, subscriber: true, id:"2"},
             { username: "Player 3",  moderator: true,  subscriber: false, id:"4"},
@@ -55,9 +58,8 @@ function PrivateMatch(props) {
             { username: "Player 13", moderator: false, subscriber: false, id:"14"},
             { username: "Player 14", moderator: true,  subscriber: true, id:"15"},
             { username: "Player 15", moderator: false, subscriber: true, id:"160"}
-        ];
-        // socket.emit("setData", dummyQueue);
-        setQueue(dummyQueue);
+        ]
+        });
     }
 
     return (
@@ -77,7 +79,7 @@ function PrivateMatch(props) {
             <Queue queue={ queue }
                    leaveQueue={ (id) => socket.emit("leaveQueue", { id }) }
                    filters={ filters }
-                   setFilters={ setFilters }/>
+                   setFilters={(filters) => socket.emit("setData", { filters })}/>
            }/>
           <CardColumn title="Active Match" content={ <RenderActiveMatch /> } />
         </Row>
@@ -86,7 +88,7 @@ function PrivateMatch(props) {
 
         <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
           <Button variant="secondary" style={{width:"50%"}} onClick={makeDummyQueue}> DUMMY </Button>
-          <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", {queue: {}})}> Clear Match </Button>
+          <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", {queue: []})}> Clear Match </Button>
         </ButtonGroup>
       </Container>
     );
@@ -107,6 +109,7 @@ function PrivateMatch(props) {
             </InputGroup.Prepend>
             <FormControl                 
               ref={ mUsername }
+              style={{boxShadow: "none"}}
             />
           </InputGroup>
           <InputGroup className="mb-3">
@@ -115,6 +118,7 @@ function PrivateMatch(props) {
             </InputGroup.Prepend>
             <FormControl 
               ref={ mPassword }
+              style={{boxShadow: "none"}}
               placeholder="Auto Generated" 
             />
           </InputGroup>
@@ -156,23 +160,21 @@ function PrivateMatch(props) {
     function RenderActiveMatch() {
         const readdParticipant = async (id) => {
             const participant = activeMatch?.players.find(p => p.id == id);
-            const hasParticipant = queue.find(p => p.id == id);
-            if(!participant || hasParticipant) return;
+            console.log(participant);
+            
+            if(!participant) return;
             socket.emit("joinQueue", participant);
         }
 
         const updateDropdown = (gamemode) => {
-            setMatch({
-                ...match,
-                gamemode
-            });
+            setGamemode(gamemode);
         }
 
         return (
           <div>
             <Dropdown style={{width:"100%", marginBottom: "3%"}} onSelect={ updateDropdown }>
               <Dropdown.Toggle variant="secondary" id="dropdown-basic" style={{width:"100%"}}>
-              { match?.gamemode ? `${match?.gamemode}v${match?.gamemode}` : "Select game mode"}
+              { gamemode ? `${gamemode}v${gamemode}` : "Select game mode"}
               </Dropdown.Toggle>
 
               <Dropdown.Menu style={{width:"100%"}}>
@@ -186,12 +188,12 @@ function PrivateMatch(props) {
             <Button
               variant="secondary" 
               style={{ width: "100%" }}
-              onClick={ () => socket.emit("startMatch") }
+              onClick={ () => socket.emit("startMatch", { gamemode: gamemode }) }
               disabled={ !match?.username || !match?.password }
             > Start Match </Button>
 
             { activeMatch?.username && activeMatch?.password &&
-              <Table striped bordered hover style={{marginTop:"5%"}}>
+              <Table striped bordered style={{marginTop:"5%"}}>
                 <tbody>
                   <tr>
                     <td style={{width:"2%"}}>Username</td>
@@ -202,8 +204,12 @@ function PrivateMatch(props) {
                     <td>{ activeMatch?.password }</td>
                   </tr>
                   <tr>
-                    <td style={{width:"2%"}}>Type</td>
-                    <td>{ activeMatch?.subsOnly ? "Subscribers only" : "Everyone" }</td>
+                    <td style={{width:"2%"}}>Gamemode</td>
+                    <td>{ `${activeMatch?.gamemode}v${activeMatch?.gamemode}` }</td>
+                  </tr>
+                  <tr>
+                    <td style={{width:"2%"}}>Filters</td>
+                    <td>{ activeMatch?.filters.join(", ") }</td>
                   </tr>
                 </tbody>
               </Table>
