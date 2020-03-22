@@ -40,28 +40,6 @@ function PrivateMatch(props) {
         });
     }, [loadData]);
 
-    function makeDummyQueue() {
-        socket.emit("setData", {
-          queue: [
-            { username: "Player 1",  moderator: true, subscriber: false, id:"1"},
-            { username: "Player 2",  moderator: false, subscriber: true, id:"2"},
-            { username: "Player 3",  moderator: true,  subscriber: false, id:"4"},
-            { username: "Player 4",  moderator: true,  subscriber: true, id:"5"},
-            { username: "Player 5",  moderator: false, subscriber: true, id:"6"},
-            { username: "Player 6",  moderator: false, subscriber: false, id:"7"},
-            { username: "Player 7",  moderator: true,  subscriber: false, id:"8"},
-            { username: "Player 8",  moderator: true,  subscriber: true, id:"9"},
-            { username: "Player 9",  moderator: false, subscriber: false, id:"10"},
-            { username: "Player 10", moderator: true,  subscriber: true, id:"11"},
-            { username: "Player 11", moderator: true,  subscriber: false, id:"12"},
-            { username: "Player 12", moderator: true,  subscriber: true, id:"13"},
-            { username: "Player 13", moderator: false, subscriber: false, id:"14"},
-            { username: "Player 14", moderator: true,  subscriber: true, id:"15"},
-            { username: "Player 15", moderator: false, subscriber: true, id:"160"}
-        ]
-        });
-    }
-
     return (
       <Container>
         <br/>
@@ -83,13 +61,6 @@ function PrivateMatch(props) {
            }/>
           <CardColumn title="Active Match" content={ <RenderActiveMatch /> } />
         </Row>
-
-        <br/><br/><br/>
-
-        <ButtonGroup aria-label="Basic example" style={{width:"100%"}}>
-          <Button variant="secondary" style={{width:"50%"}} onClick={makeDummyQueue}> DUMMY </Button>
-          <Button variant="secondary" style={{width:"50%"}} onClick={() => socket.emit("setData", {queue: []})}> Clear Match </Button>
-        </ButtonGroup>
       </Container>
     );
 

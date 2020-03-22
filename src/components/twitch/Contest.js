@@ -12,7 +12,6 @@ const socket = io(`${process.env.REACT_APP_BASE_URL}/twitch/contest`, {
 function Contest() {
     const [load, setLoad] = useState(null);
     const [queue, setQueue] = useState([]);
-    const [queueOptions, setQueueOptions] = useState([]);
     const [messages, setMessages] = useState([]);
     const [winner, setWinner] = useState({});
     const [filters, setFilters] = useState([]);
@@ -55,7 +54,7 @@ function Contest() {
             > DRAW </Button>
 
            <Queue queue={ queue }
-                  leaveQueue={ (id) => console.log(id) }
+                  leaveQueue={ (id) => socket.emit("leaveQueue", { id }) }
                   filters={ filters }
                   setFilters={(filters) => socket.emit("setData", { filters })}/>
           </div>
