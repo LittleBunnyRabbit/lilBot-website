@@ -1,12 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './css/index.css';
-import App from './components/App';
-import * as serviceWorker from './serviceWorker';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { CookiesProvider } from 'react-cookie';
+import App from './App';
+import * as serviceWorker from './default/serviceWorker';
+import { ThemeProvider, CSSReset, ColorModeProvider } from "@chakra-ui/core";
+import { customTheme } from "./misc/theme";
 
-ReactDOM.render(<CookiesProvider><App /></CookiesProvider>, document.getElementById('root'));
+ReactDOM.render(
+  <React.StrictMode>
+    <ThemeProvider theme={customTheme}>
+      <ColorModeProvider>
+        <CSSReset />
+        <App />
+      </ColorModeProvider>
+    </ThemeProvider>
+  </React.StrictMode>,
+  document.getElementById('root')
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -1,0 +1,307 @@
+{
+    Brain: {
+        memories: {}
+    },
+    HurtByTimestamp: 0,
+    SleepTimer: 0 s,
+    Attributes: [{
+        Base: 20.0 d,
+        Name: "generic.maxHealth"
+    }, {
+        Base: 0.0 d,
+        Name: "generic.knockbackResistance"
+    }, {
+        Base: 0.10000000149011612 d,
+        Name: "generic.movementSpeed"
+    }, {
+        Base: 0.0 d,
+        Modifiers: [],
+        Name: "generic.armor"
+    }, {
+        Base: 0.0 d,
+        Modifiers: [],
+        Name: "generic.armorToughness"
+    }, {
+        Base: 1.0 d,
+        Name: "generic.attackDamage"
+    }, {
+        Base: 4.0 d,
+        Name: "generic.attackSpeed"
+    }, {
+        Base: 0.0 d,
+        Name: "generic.luck"
+    }],
+    Invulnerable: 0b,
+    FallFlying: 0b,
+    PortalCooldown: 0,
+    AbsorptionAmount: 0.0 f,
+    abilities: {
+        invulnerable: 1 b,
+        mayfly: 1 b,
+        instabuild: 1 b,
+        walkSpeed: 0.1 f,
+        mayBuild: 1 b,
+        flying: 0b,
+        flySpeed: 0.05 f
+    },
+    FallDistance: 0.0 f,
+    recipeBook: {
+        recipes: ["minecraft:chest", "minecraft:rail", "minecraft:powered_rail", "minecraft:charcoal", "minecraft:polished_granite_stairs", "minecraft:acacia_boat", "minecraft:item_frame", "minecraft:jungle_boat", "minecraft:green_concrete_powder", "minecraft:smooth_sandstone", "minecraft:oak_stairs", "minecraft:polished_granite_stairs_from_polished_granite_stonecutting", "minecraft:gold_ingot", "minecraft:dark_oak_boat", "minecraft:lectern", "minecraft:detector_rail", "minecraft:oak_fence_gate", "minecraft:coal_from_blasting", "minecraft:cooked_beef", "minecraft:spruce_planks", "minecraft:sandstone", "minecraft:yellow_concrete_powder", "minecraft:hopper_minecart", "minecraft:repeater", "minecraft:red_concrete_powder", "minecraft:gold_nugget_from_blasting", "minecraft:glass", "minecraft:cut_sandstone_from_sandstone_stonecutting", "minecraft:crafting_table", "minecraft:polished_andesite_slab_from_andesite_stonecutting", "minecraft:sandstone_stairs_from_sandstone_stonecutting", "minecraft:furnace_minecart", "minecraft:sandstone_wall", "minecraft:cooked_beef_from_smoking", "minecraft:blue_concrete_powder", "minecraft:gold_nugget_from_smelting", "minecraft:white_concrete_powder", "minecraft:oak_fence", "minecraft:polished_andesite_stairs_from_andesite_stonecutting", "minecraft:cut_sandstone_slab_from_cut_sandstone_stonecutting", "minecraft:gray_concrete_powder", "minecraft:spruce_fence_gate", "minecraft:stick", "minecraft:iron_nugget_from_smelting", "minecraft:leather_chestplate", "minecraft:light_blue_concrete_powder", "minecraft:light_gray_concrete_powder", "minecraft:oak_sign", "minecraft:leather_boots", "minecraft:gold_ingot_from_blasting", "minecraft:spruce_sign", "minecraft:polished_granite_slab_from_polished_granite_stonecutting", "minecraft:oak_trapdoor", "minecraft:lime_concrete_powder", "minecraft:leather_leggings", "minecraft:sandstone_wall_from_sandstone_stonecutting", "minecraft:coal_from_smelting", "minecraft:writable_book", "minecraft:oak_door", "minecraft:red_dye_from_tulip", "minecraft:leather_helmet", "minecraft:activator_rail", "minecraft:barrel", "minecraft:andesite_slab_from_andesite_stonecutting", "minecraft:spruce_stairs", "minecraft:iron_nugget_from_blasting", "minecraft:iron_ingot", "minecraft:spruce_trapdoor", "minecraft:spruce_fence", "minecraft:spruce_door", "minecraft:andesite_slab", "minecraft:sandstone_slab_from_sandstone_stonecutting", "minecraft:cut_sandstone", "minecraft:spruce_button", "minecraft:black_concrete_powder", "minecraft:chiseled_sandstone_from_sandstone_stonecutting", "minecraft:purple_concrete_powder", "minecraft:spruce_pressure_plate", "minecraft:cauldron", "minecraft:pink_concrete_powder", "minecraft:birch_planks", "minecraft:bookshelf", "minecraft:polished_andesite_from_andesite_stonecutting", "minecraft:leather_horse_armor", "minecraft:tnt_minecart", "minecraft:oak_button", "minecraft:spruce_boat", "minecraft:birch_boat", "minecraft:acacia_planks", "minecraft:brown_concrete_powder", "minecraft:cooked_beef_from_campfire_cooking", "minecraft:orange_concrete_powder", "minecraft:magenta_concrete_powder", "minecraft:andesite_wall", "minecraft:oak_pressure_plate", "minecraft:sandstone_slab", "minecraft:iron_ingot_from_blasting", "minecraft:andesite_wall_from_andesite_stonecutting", "minecraft:sandstone_stairs", "minecraft:oak_slab", "minecraft:cut_sandstone_slab_from_sandstone_stonecutting", "minecraft:acacia_wood", "minecraft:spruce_slab", "minecraft:cyan_concrete_powder", "minecraft:andesite_stairs_from_andesite_stonecutting", "minecraft:polished_granite_slab", "minecraft:chest_minecart", "minecraft:oak_boat", "minecraft:polished_andesite", "minecraft:andesite_stairs"],
+        isFilteringCraftable: 0b,
+        toBeDisplayed: ["minecraft:chest", "minecraft:rail", "minecraft:powered_rail", "minecraft:charcoal", "minecraft:polished_granite_stairs", "minecraft:acacia_boat", "minecraft:item_frame", "minecraft:jungle_boat", "minecraft:green_concrete_powder", "minecraft:smooth_sandstone", "minecraft:oak_stairs", "minecraft:polished_granite_stairs_from_polished_granite_stonecutting", "minecraft:gold_ingot", "minecraft:dark_oak_boat", "minecraft:lectern", "minecraft:detector_rail", "minecraft:oak_fence_gate", "minecraft:coal_from_blasting", "minecraft:cooked_beef", "minecraft:spruce_planks", "minecraft:sandstone", "minecraft:yellow_concrete_powder", "minecraft:hopper_minecart", "minecraft:repeater", "minecraft:red_concrete_powder", "minecraft:gold_nugget_from_blasting", "minecraft:glass", "minecraft:cut_sandstone_from_sandstone_stonecutting", "minecraft:crafting_table", "minecraft:polished_andesite_slab_from_andesite_stonecutting", "minecraft:sandstone_stairs_from_sandstone_stonecutting", "minecraft:furnace_minecart", "minecraft:sandstone_wall", "minecraft:cooked_beef_from_smoking", "minecraft:blue_concrete_powder", "minecraft:gold_nugget_from_smelting", "minecraft:white_concrete_powder", "minecraft:oak_fence", "minecraft:polished_andesite_stairs_from_andesite_stonecutting", "minecraft:cut_sandstone_slab_from_cut_sandstone_stonecutting", "minecraft:gray_concrete_powder", "minecraft:spruce_fence_gate", "minecraft:stick", "minecraft:iron_nugget_from_smelting", "minecraft:leather_chestplate", "minecraft:light_blue_concrete_powder", "minecraft:light_gray_concrete_powder", "minecraft:oak_sign", "minecraft:leather_boots", "minecraft:gold_ingot_from_blasting", "minecraft:spruce_sign", "minecraft:polished_granite_slab_from_polished_granite_stonecutting", "minecraft:oak_trapdoor", "minecraft:lime_concrete_powder", "minecraft:leather_leggings", "minecraft:sandstone_wall_from_sandstone_stonecutting", "minecraft:coal_from_smelting", "minecraft:writable_book", "minecraft:oak_door", "minecraft:red_dye_from_tulip", "minecraft:leather_helmet", "minecraft:activator_rail", "minecraft:barrel", "minecraft:andesite_slab_from_andesite_stonecutting", "minecraft:spruce_stairs", "minecraft:iron_nugget_from_blasting", "minecraft:iron_ingot", "minecraft:spruce_trapdoor", "minecraft:spruce_fence", "minecraft:spruce_door", "minecraft:andesite_slab", "minecraft:sandstone_slab_from_sandstone_stonecutting", "minecraft:cut_sandstone", "minecraft:spruce_button", "minecraft:black_concrete_powder", "minecraft:chiseled_sandstone_from_sandstone_stonecutting", "minecraft:purple_concrete_powder", "minecraft:spruce_pressure_plate", "minecraft:cauldron", "minecraft:pink_concrete_powder", "minecraft:birch_planks", "minecraft:bookshelf", "minecraft:polished_andesite_from_andesite_stonecutting", "minecraft:leather_horse_armor", "minecraft:tnt_minecart", "minecraft:oak_button", "minecraft:spruce_boat", "minecraft:birch_boat", "minecraft:acacia_planks", "minecraft:brown_concrete_powder", "minecraft:cooked_beef_from_campfire_cooking", "minecraft:orange_concrete_powder", "minecraft:magenta_concrete_powder", "minecraft:andesite_wall", "minecraft:oak_pressure_plate", "minecraft:sandstone_slab", "minecraft:iron_ingot_from_blasting", "minecraft:andesite_wall_from_andesite_stonecutting", "minecraft:sandstone_stairs", "minecraft:oak_slab", "minecraft:cut_sandstone_slab_from_sandstone_stonecutting", "minecraft:acacia_wood", "minecraft:spruce_slab", "minecraft:cyan_concrete_powder", "minecraft:andesite_stairs_from_andesite_stonecutting", "minecraft:polished_granite_slab", "minecraft:chest_minecart", "minecraft:oak_boat", "minecraft:polished_andesite", "minecraft:andesite_stairs"],
+        isFurnaceGuiOpen: 0b,
+        isGuiOpen: 0b,
+        isFurnaceFilteringCraftable: 0b
+    },
+    DeathTime: 0 s,
+    XpSeed: -1883645433,
+    XpTotal: 0,
+    playerGameType: 1,
+    SelectedItem: {
+        id: "minecraft:stone_button",
+        Count: 1 b
+    },
+    seenCredits: 0b,
+    Motion: [0.0 d, -0.0784000015258789 d, 0.0 d],
+    UUIDLeast: -5622813137917978955 L,
+    Health: 20.0 f,
+    foodSaturationLevel: 4.0 f,
+    Air: 300 s,
+    OnGround: 1 b,
+    Dimension: 0,
+    Rotation: [264.8614 f, 12.204567 f],
+    XpLevel: 0,
+    Score: 0,
+    UUIDMost: -7148169273874300054 L,
+    Pos: [-22.101783485606198 d, 56.0 d, -16.941618441050572 d],
+    Fire: -20 s,
+    XpP: 0.0 f,
+    EnderItems: [],
+    DataVersion: 2230,
+    foodLevel: 20,
+    foodExhaustionLevel: 3.6110048 f,
+    HurtTime: 0 s,
+    SelectedItemSlot: 3,
+    Inventory: [{
+        Slot: 0b,
+        id: "minecraft:command_block",
+        Count: 1 b
+    }, {
+        Slot: 1 b,
+        id: "minecraft:stripped_birch_wood",
+        Count: 1 b
+    }, {
+        Slot: 2 b,
+        id: "minecraft:iron_ore",
+        Count: 1 b
+    }, {
+        Slot: 3 b,
+        id: "minecraft:stone_button",
+        Count: 1 b
+    }, {
+        Slot: 4 b,
+        id: "minecraft:diamond_pickaxe",
+        Count: 1 b,
+        tag: {
+            RepairCost: 7,
+            Damage: 203,
+            Enchantments: [{
+                lvl: 3 s,
+                id: "minecraft:depth_strider"
+            }, {
+                lvl: 1 s,
+                id: "minecraft:silk_touch"
+            }, {
+                lvl: 4 s,
+                id: "minecraft:efficiency"
+            }]
+        }
+    }, {
+        Slot: 5 b,
+        id: "minecraft:command_block",
+        Count: 1 b
+    }, {
+        Slot: 6 b,
+        id: "minecraft:golden_chestplate",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: 7 b,
+        id: "minecraft:diamond_boots",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: 8 b,
+        id: "minecraft:diamond_leggings",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: 9 b,
+        id: "minecraft:redstone_torch",
+        Count: 1 b
+    }, {
+        Slot: 10 b,
+        id: "minecraft:rail",
+        Count: 1 b
+    }, {
+        Slot: 11 b,
+        id: "minecraft:oak_boat",
+        Count: 1 b
+    }, {
+        Slot: 12 b,
+        id: "minecraft:gold_ore",
+        Count: 2 b
+    }, {
+        Slot: 13 b,
+        id: "minecraft:andesite",
+        Count: 1 b
+    }, {
+        Slot: 14 b,
+        id: "minecraft:coal_ore",
+        Count: 1 b
+    }, {
+        Slot: 15 b,
+        id: "minecraft:jungle_sapling",
+        Count: 1 b
+    }, {
+        Slot: 16 b,
+        id: "minecraft:acacia_sapling",
+        Count: 1 b
+    }, {
+        Slot: 17 b,
+        id: "minecraft:spruce_planks",
+        Count: 1 b
+    }, {
+        Slot: 18 b,
+        id: "minecraft:birch_fence_gate",
+        Count: 1 b
+    }, {
+        Slot: 19 b,
+        id: "minecraft:red_tulip",
+        Count: 1 b
+    }, {
+        Slot: 20 b,
+        id: "minecraft:acacia_boat",
+        Count: 1 b
+    }, {
+        Slot: 21 b,
+        id: "minecraft:birch_boat",
+        Count: 1 b
+    }, {
+        Slot: 22 b,
+        id: "minecraft:enchanted_book",
+        Count: 1 b,
+        tag: {
+            StoredEnchantments: [{
+                lvl: 4 s,
+                id: "minecraft:blast_protection"
+            }]
+        }
+    }, {
+        Slot: 23 b,
+        id: "minecraft:sandstone",
+        Count: 64 b
+    }, {
+        Slot: 24 b,
+        id: "minecraft:rabbit_stew",
+        Count: 1 b
+    }, {
+        Slot: 25 b,
+        id: "minecraft:activator_rail",
+        Count: 1 b
+    }, {
+        Slot: 26 b,
+        id: "minecraft:spruce_wood",
+        Count: 1 b
+    }, {
+        Slot: 27 b,
+        id: "minecraft:tipped_arrow",
+        Count: 1 b,
+        tag: {
+            Potion: "minecraft:strong_leaping"
+        }
+    }, {
+        Slot: 28 b,
+        id: "minecraft:tipped_arrow",
+        Count: 1 b,
+        tag: {
+            Potion: "minecraft:strong_slowness"
+        }
+    }, {
+        Slot: 29 b,
+        id: "minecraft:name_tag",
+        Count: 1 b
+    }, {
+        Slot: 30 b,
+        id: "minecraft:jungle_boat",
+        Count: 1 b
+    }, {
+        Slot: 31 b,
+        id: "minecraft:minecart",
+        Count: 1 b
+    }, {
+        Slot: 32 b,
+        id: "minecraft:enchanted_book",
+        Count: 1 b,
+        tag: {
+            StoredEnchantments: [{
+                lvl: 4 s,
+                id: "minecraft:feather_falling"
+            }]
+        }
+    }, {
+        Slot: 33 b,
+        id: "minecraft:saddle",
+        Count: 1 b
+    }, {
+        Slot: 34 b,
+        id: "minecraft:anvil",
+        Count: 1 b
+    }, {
+        Slot: 35 b,
+        id: "minecraft:saddle",
+        Count: 1 b
+    }, {
+        Slot: 100 b,
+        id: "minecraft:diamond_boots",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: 101 b,
+        id: "minecraft:diamond_leggings",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: 102 b,
+        id: "minecraft:elytra",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: 103 b,
+        id: "minecraft:diamond_helmet",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }, {
+        Slot: -106 b,
+        id: "minecraft:diamond_pickaxe",
+        Count: 1 b,
+        tag: {
+            Damage: 0
+        }
+    }],
+    foodTickTimer: 0
+}
