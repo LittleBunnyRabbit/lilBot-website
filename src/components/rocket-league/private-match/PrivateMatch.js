@@ -16,8 +16,27 @@ import {
   ModalFooter,
   ModalHeader,
   SimpleGrid,
-  Flex
+  Flex,
+  IconButton,
+  Heading,
+  ButtonGroup,
+  Editable,
+  EditablePreview,
+  EditableInput,
+  NumberInput,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  RadioButtonGroup
 } from "@chakra-ui/core";
+
+import {
+  VarInfo,
+  MatchInfo
+} from "../../extra/BoxStyles";
+
+import { EditPopover } from "../../extra/EditPopover";
 
 let que = [
     { username: "someone 1", id: 1, subscriber: true, moderator: true },
@@ -41,67 +60,114 @@ export default function PrivateMatch() {
     const qFilters = [
         { name: "subscriber", icon: "🥔", color: "purple" },
         { name: "moderator", icon: "⚔️", color: "green" },
-    ]
+    ];
 
-    const CreateMatch = () => (
-        <Modal
-          isOpen={isOpen}
-          onClose={onClose}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Create New Private Match</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb={6}>
-              <FormControl>
-                <FormLabel>Username</FormLabel>
-                <Input />
-              </FormControl>
+    const InfoComponent = () => {
+        return (
+          <Flex
+            direction="column"
+            justify="flex-start"
+            align="left"
+            marginTop="1%"
+          >
+            <Heading as="h2" size="xl">Create Match</Heading>
+            <VarInfo name="Username" value={ match?.name } mb="0.5rem">
+              <IconButton icon="edit" size="sm" />
+            </VarInfo>
+            <VarInfo name="Password" value={ match?.password  } mb="0.5rem">
+              <Box>
+                <IconButton icon="edit" size="sm" mr="5px"/>
+                <IconButton icon="repeat" size="sm" />
+              </Box>
+            </VarInfo>
+            <Example />
+            <Button
+              width="100%"
+              mt="0.5rem"
+            >
+              START
+            </Button>
+          </Flex>
+        );
 
-              <FormControl mt={4}>
-                <FormLabel>Password</FormLabel>
-                <Input placeholder="Optional" />
-              </FormControl>
-            </ModalBody>
+        function Example() {
+          const CustomRadio = React.forwardRef((props, ref) => {
+            const { isChecked, isDisabled, value, ...rest } = props;
+            return (
+              <Button
+                ref={ref}
+                variantColor={isChecked ? "green" : "gray"}
+                aria-checked={isChecked}
+                role="radio"
+                isDisabled={isDisabled}
+                {...rest}
+              />
+            );
+          });
+      
+          return (
+            <RadioButtonGroup
+              defaultValue={1}
+              onChange={val => console.log(val)}
+              isInline
+              width="100%"
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+            >
+              { Array.from(Array(4).keys()).map(value => {
+                  value++;
+                  return <CustomRadio value={value} children={`${value}v${value}`} width="100%"/>
+                })
+              }
+            </RadioButtonGroup>
+          );
+        }
+    }
 
-            <ModalFooter>
-              <Button variantColor="blue" mr={3}>
-                Submit
-              </Button>
-              <Button onClick={onClose}>Cancel</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-    );
+    const QueueComponent = () => {
+        return (
+          <Box>
+            <Heading as="h2" size="xl">Queue</Heading>
+            <Queue queue={ que } filters={ qFilters }/>
+          </Box>
+        );
+    }
+
+    const MatchComponent = () => {
+        return (
+          <Box width="100%">
+            <Heading as="h2" size="xl">Active Match</Heading>
+            <SimpleGrid columns={[1, 1, 2]} spacing={10} mb={10}>
+              <Box>
+                <MatchInfo name="username" value="My Username" />
+                <MatchInfo name="password" value="asda8s4d65a" />
+                <MatchInfo name="mode" value="3v3" />
+              </Box>
+              <Box>
+                {/* { que.slice(0, 5).map(player => (
+                  <Box>
+                    { player?.username }{" "}
+                    { qFilters?.map(filter => player[filter?.name] ? filter?.icon : "" )}
+                  </Box>
+                ))
+
+                }         */}
+                *insert players*
+
+              </Box>
+            </SimpleGrid>
+          </Box>
+        )
+    }
 
     return (
-        <CPNT.Base>
-          <SimpleGrid columns={[1, 1, 2]} spacing={10}>
-            <Box height="80px">
-              <Queue 
-                queue={ que } 
-                filters={ qFilters }
-              />
-            </Box>
-            <Box height="80px">
-              <CreateMatch />
-              <Button onClick={ onOpen } width="100%">Create Match</Button>
-              <Flex
-                direction="column"
-                justify="flex-start"
-                align="left"
-                marginTop="1%"
-              >
-                <Box>
-                  { match?.name }
-                </Box>
-                <Box>
-                  { match?.password }
-                </Box>
-              </Flex>
-            </Box>
-          </SimpleGrid>
-
-        </CPNT.Base>
-    )
+      <CPNT.Base>
+        <SimpleGrid columns={[1, 1, 2]} spacing={10} mb={10}>
+          <InfoComponent />
+          <QueueComponent />
+        </SimpleGrid>
+        <MatchComponent />
+      </CPNT.Base>
+    );
 }

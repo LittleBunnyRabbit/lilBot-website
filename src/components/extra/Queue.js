@@ -8,7 +8,7 @@ import {
     ModalBody, ModalHeader,
     ModalContent, ModalOverlay,
     ModalCloseButton, CheckboxGroup,
-    Badge
+    Badge, Avatar
 } from "@chakra-ui/core";
 
 export default function Queue({ queue, filters, ...props }) {

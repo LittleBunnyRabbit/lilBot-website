@@ -45,6 +45,9 @@ export default function Navbar() {
         </Box>
 
         {/* <img src={logo} width="30px"/> */}
+        <Heading as="h2" size="xl">
+          lilBot
+        </Heading>
 
         <Box>
           <IconButton 
